@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Logística MPR - Renault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            border-bottom: 3px solid #f8dc75;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .config-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .config-section input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 400px;
+            margin-right: 10px;
+        }
+
+        .config-section button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .config-section button:hover {
+            background: #5a6fd8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .reference-input {
+            position: relative;
+        }
+
+        .reference-input input {
+            padding-right: 50px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(86, 171, 47, 0.3);
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .process-info {
+            background: linear-gradient(135deg, #f8dc75, #ffeaa7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 5px solid #fdcb6e;
+        }
+
+        .process-info h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .documents-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 2px dashed #dee2e6;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .document-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .doc-icon {
+            width: 40px;
+            height: 40px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-error { background: #f8d7da; color: #721c24; }
+
+        .email-preview {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .email-header {
+            border-bottom: 2px solid #f8dc75;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .email-content {
+            line-height: 1.6;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: #f8dc75;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.warning { background: #ffc107; color: #333; }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 1rem auto;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+
+            .config-section input {
+                width: 100%;
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+        }
+
+        .recipient-manager {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .recipient-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .recipient-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .recipient-tag {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recipient-tag .remove {
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.connected { background: #28a745; }
+        .status-dot.disconnected { background: #dc3545; }
+        .status-dot.loading { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🚛 Sistema Logística MPR</h1>
+        <div class="subtitle">
+            Gestão de Carregamentos - Renault do Brasil
+            <div class="api-status" id="api-status">
+                <div class="status-dot disconnected" id="status-dot"></div>
+                <span id="status-text">API Desconectada</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 🆕 SEÇÃO DE CONFIGURAÇÃO DA API -->
+    <div class="config-section" id="config-section">
+        <label for="api-url"><strong>🔧 Configurar URL da API:</strong></label>
+        <input type="url" id="api-url" placeholder="Cole aqui a URL da sua API do Google Apps Script" value="">
+        <button onclick="salvarConfigAPI()">💾 Salvar</button>
+        <button onclick="testarAPI()">🧪 Testar</button>
+        <small style="display: block; margin-top: 8px; color: #666;">
+            📝 Cole a URL da implantação do seu Google Apps Script aqui
+        </small>
+    </div>
+
+    <div class="container">
+        <!-- Seção de Input -->
+        <div class="card">
+            <div class="input-section">
+                <h2>📋 Buscar Processo</h2>
+                
+                <div class="input-group">
+                    <label for="referencia">Referência do Processo</label>
+                    <div class="reference-input">
+                        <input type="text" id="referencia" placeholder="Ex: MQBFRA059325" autocomplete="off">
+                        <button class="search-btn" onclick="buscarProcesso()">🔍</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="tipo-aba">Tipo de Carregamento</label>
+                    <select id="tipo-aba">
+                        <option value="">Selecione...</option>
+                        <option value="VCP">VCP - Aéreo</option>
+                        <option value="GRU">GRU - Aéreo</option>
+                        <option value="CWB">CWB - Aéreo</option>
+                        <option value="PNG MARÍTIMO">PNG MARÍTIMO</option>
+                    </select>
+                </div>
+
+                <div class="recipient-manager">
+                    <h3>📧 Destinatários</h3>
+                    
+                    <div class="recipient-group">
+                        <label>Para (Principal):</label>
+                        <input type="email" id="email-para" placeholder="email@empresa.com">
+                        <div class="recipient-tags" id="tags-para"></div>
+                    </div>
+
+                    <div class="recipient-group">
+                        <label>CC (Cópia):</label>
+                        <input type="email" id="email-cc" placeholder="email@empresa.com">
+                        <div class="recipient-tags" id="tags-cc"></div>
+                    </div>
+
+                    <div class="recipient-group">
+                        <label>CCO (Cópia Oculta):</label>
+                        <input type="email" id="email-cco" placeholder="email@empresa.com">
+                        <div class="recipient-tags" id="tags-cco"></div>
+                    </div>
+
+                    <button class="btn" style="background: #17a2b8; color: white; font-size: 0.8rem; padding: 8px 16px;" onclick="carregarDestinatarios()">
+                        📥 Carregar Destinatários Padrão
+                    </button>
+                </div>
+
+                <button class="btn btn-primary" onclick="buscarProcesso()">
+                    🔍 Buscar Dados
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção de Resultados -->
+        <div class="card">
+            <div class="results-section">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Buscando dados do processo...</p>
+                </div>
+
+                <div id="results" style="display: none;">
+                    <h2>📊 Dados do Processo</h2>
+                    
+                    <div class="process-info">
+                        <h3>ℹ️ Informações Gerais</h3>
+                        <div class="info-grid" id="info-grid">
+                            <!-- Dados serão inseridos dinamicamente -->
+                        </div>
+                    </div>
+
+                    <div class="documents-section">
+                        <h3>📁 Documentos Encontrados</h3>
+                        <div id="documents-list">
+                            <!-- Lista de documentos -->
+                        </div>
+                    </div>
+
+                    <div class="email-preview">
+                        <div class="email-header">
+                            <h3>✉️ Preview do Email</h3>
+                            <div id="email-subject"></div>
+                        </div>
+                        <div class="email-content" id="email-content">
+                            <!-- Conteúdo do email -->
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success" onclick="enviarEmail()">
+                        📧 Criar Rascunho de Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🆕 CONFIGURAÇÃO DA API
+        let API_URL = localStorage.getItem('api_url') || '';
+        
+        // Inicializar interface
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiInput = document.getElementById('api-url');
+            apiInput.value = API_URL;
+            
+            if (API_URL) {
+                document.getElementById('config-section').style.display = 'none';
+                atualizarStatusAPI('connected');
+            } else {
+                atualizarStatusAPI('disconnected');
+            }
+
+            // Event listeners para adicionar emails com Enter
+            ['para', 'cc', 'cco'].forEach(tipo => {
+                const input = document.getElementById(`email-${tipo}`);
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        adicionarDestinatario(tipo);
+                    }
+                });
+            });
+
+            // Enter para buscar
+            document.getElementById('referencia').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarProcesso();
+                }
+            });
+        });
+
+        function salvarConfigAPI() {
+            const url = document.getElementById('api-url').value.trim();
+            
+            if (!url) {
+                showNotification('Digite a URL da API!', 'error');
+                return;
+            }
+
+            if (!url.includes('script.google.com')) {
+                showNotification('URL deve ser do Google Apps Script!', 'error');
+                return;
+            }
+
+            API_URL = url;
+            localStorage.setItem('api_url', API_URL);
+            document.getElementById('config-section').style.display = 'none';
+            
+            showNotification('API configurada com sucesso!', 'success');
+            atualizarStatusAPI('connected');
+        }
+
+        async function testarAPI() {
+            const url = document.getElementById('api-url').value.trim();
+            
+            if (!url) {
+                showNotification('Digite a URL da API!', 'error');
+                return;
+            }
+
+            atualizarStatusAPI('loading');
+            
+            try {
+                const response = await fetch(url + '?action=test', {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+
+                // Como é no-cors, sempre chegará aqui se a URL existir
+                showNotification('API está respondendo!', 'success');
+                atualizarStatusAPI('connected');
+                
+            } catch (error) {
+                showNotification('Erro ao conectar com a API!', 'error');
+                atualizarStatusAPI('disconnected');
+            }
+        }
+
+        function atualizarStatusAPI(status) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            
+            dot.className = `status-dot ${status}`;
+            
+            switch(status) {
+                case 'connected':
+                    text.textContent = 'API Conectada';
+                    break;
+                case 'loading':
+                    text.textContent = 'Testando API...';
+                    break;
+                default:
+                    text.textContent = 'API Desconectada';
+            }
+        }
+
+        // 🆕 FUNÇÕES DA API
+        async function chamarAPI(action, dados = {}) {
+            if (!API_URL) {
+                showNotification('Configure a URL da API primeiro!', 'error');
+                document.getElementById('config-section').style.display = 'block';
+                return null;
+            }
+
+            try {
+                const payload = { action, ...dados };
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                return result;
+
+            } catch (error) {
+                console.error('Erro na API:', error);
+                showNotification('Erro de conexão com a API!', 'error');
+                atualizarStatusAPI('disconnected');
+                return null;
+            }
+        }
+
+        let destinatarios = {
+            para: [],
+            cc: [],
+            cco: []
+        };
+
+        let processoAtual = null;
+
+        // Gerenciamento de destinatários
+        function adicionarDestinatario(tipo) {
+            const input = document.getElementById(`email-${tipo}`);
+            const email = input.value.trim();
+            
+            if (email && isValidEmail(email)) {
+                if (!destinatarios[tipo].includes(email)) {
+                    destinatarios[tipo].push(email);
+                    input.value = '';
+                    atualizarTagsDestinatarios();
+                    showNotification('Email adicionado com sucesso!', 'success');
+                } else {
+                    showNotification('Email já está na lista!', 'warning');
+                }
+            } else {
+                showNotification('Digite um email válido!', 'error');
+            }
+        }
+
+        function removerDestinatario(tipo, email) {
+            destinatarios[tipo] = destinatarios[tipo].filter(e => e !== email);
+            atualizarTagsDestinatarios();
+        }
+
+        function atualizarTagsDestinatarios() {
+            Object.keys(destinatarios).forEach(tipo => {
+                const container = document.getElementById(`tags-${tipo}`);
+                container.innerHTML = '';
+                
+                destinatarios[tipo].forEach(email => {
+                    const tag = document.createElement('div');
+                    tag.className = 'recipient-tag';
+                    tag.innerHTML = `
+                        ${email}
+                        <span class="remove" onclick="removerDestinatario('${tipo}', '${email}')">×</span>
+                    `;
+                    container.appendChild(tag);
+                });
+            });
+        }
+
+        async function carregarDestinatarios() {
+            const tipoAba = document.getElementById('tipo-aba').value;
+            
+            if (!tipoAba) {
+                showNotification('Selecione o tipo de carregamento primeiro!', 'warning');
+                return;
+            }
+
+            const resultado = await chamarAPI('listarDestinatarios', { tipoAba });
+            
+            if (resultado && resultado.success) {
+                destinatarios = resultado.data;
+                atualizarTagsDestinatarios();
+                showNotification('Destinatários carregados!', 'success');
+            } else {
+                showNotification('Erro ao carregar destinatários!', 'error');
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        async function buscarProcesso() {
+            const referencia = document.getElementById('referencia').value.trim();
+            const tipoAba = document.getElementById('tipo-aba').value;
+            
+            if (!referencia) {
+                showNotification('Digite uma referência!', 'error');
+                return;
+            }
+
+            if (!tipoAba) {
+                showNotification('Selecione o tipo de carregamento!', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            const resultado = await chamarAPI('buscarProcesso', { 
+                referencia, 
+                tipoAba 
+            });
+
+            document.getElementById('loading').style.display = 'none';
+
+            if (resultado && resultado.success) {
+                processoAtual = resultado.data;
+                preencherDados(resultado.data, tipoAba);
+                document.getElementById('results').style.display = 'block';
+                showNotification('Dados encontrados!', 'success');
+            } else {
+                showNotification(resultado?.error || 'Processo não encontrado!', 'error');
+            }
+        }
+
+        function preencherDados(dados, tipoAba) {
+            // Preencher informações gerais
+            const infoGrid = document.getElementById('info-grid');
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Volumes</div>
+                    <div class="info-value">${dados.volumes || 'Pendente OCR'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Peso Bruto</div>
+                    <div class="info-value">${dados.pesoLiquido ? dados.pesoLiquido + ' kg' : 'Pendente OCR'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">CIF</div>
+                    <div class="info-value">${dados.cif || 'Pendente OCR'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">AFRMM</div>
+                    <div class="info-value">${dados.afrmm ? 'R$ ' + dados.afrmm : 'N/A'}</div>
+                </div>
+            `;
+
+            // Mostrar documentos encontrados
+            const docsList = document.getElementById('documents-list');
+            if (dados.documentos && dados.documentos.length > 0) {
+                docsList.innerHTML = dados.documentos.map(doc => `
+                    <div class="document-item">
+                        <div class="document-info">
+                            <div class="doc-icon">${doc.tipo}</div>
+                            <div>
+                                <div><strong>${getTipoDocumentoNome(doc.tipo)}</strong></div>
+                                <div style="font-size: 0.8rem; color: #666;">${doc.nome} (${doc.tamanho})</div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-success">${doc.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                docsList.innerHTML = `
+                    <div class="document-item">
+                        <div class="document-info">
+                            <div class="doc-icon" style="background: #ffc107;">⚠️</div>
+                            <div>
+                                <div><strong>Nenhum documento encontrado</strong></div>
+                                <div style="font-size: 0.8rem; color: #666;">Verifique a pasta do processo</div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-warning">Não encontrado</span>
+                    </div>
+                `;
+            }
+
+            // Gerar preview do email
+            gerarPreviewEmail(dados, tipoAba);
+        }
+
+        function getTipoDocumentoNome(tipo) {
+            const nomes = {
+                'CI': 'Certificado de Importação',
+                'DI': 'Declaração de Importação',
+                'GLME': 'Guia GLME',
+                'CCT': 'Extrato CCT'
+            };
+            return nomes[tipo] || tipo;
+        }
+
+        function gerarPreviewEmail(dados, tipoAba) {
+            const agora = new Date();
+            const saudacao = agora.getHours() < 12 ? "Bom dia" : "Boa tarde";
+            
+            const assunto = `MPR - REGISTRO DI - ${tipoAba} - ${dados.faturaNumero || 'N/A'} - CNPJ 001900`;
+            
+            document.getElementById('email-subject').innerHTML = `<strong>Assunto:</strong> ${assunto}`;
+
+            // Gerar tabela baseada no tipo
+            const tabelaHTML = gerarTabelaHTML(dados, tipoAba);
+
+            const templates = {
+                "VCP": `Prezados, ${saudacao.toLowerCase()}.<br><br>Segue(m) registro(s) Renault - VCP.<br><br><span style="background-color: yellow; font-weight: bold;">Em anexo DI.</span>`,
+                
+                "GRU": `Prezados, ${saudacao.toLowerCase()}.<br><br>Segue(m) registro(s) Renault - GRU.<br><br><span style="background-color: yellow; font-weight: bold;">Em anexo CI, DI e GLME.</span>`,
+                
+                "CWB": `${saudacao},<br><br>Segue(m) registro(s) Renault - CWB.<br><br><span style="background-color: yellow; font-weight: bold;">Em anexo CI, DI, GLME e extrato do CCT.</span>`,
+                
+                "PNG MARÍTIMO": `${saudacao},<br><br>Segue(m) registro(s) MPR RENAULT.<br><br><span style="background-color: yellow; font-weight: bold;">Em anexo CI, DI e GLME.</span><br><br>Navio: <br>ATA: `
+            };
+
+            const corpoEmail = `
+                ${templates[tipoAba] || `${saudacao},<br><br>Segue(m) registros Renault.`}
+                <br><br>
+                ${tabelaHTML}
+                <br>
+                <p>Atenciosamente,<br>Equipe Logística</p>
+            `;
+
+            document.getElementById('email-content').innerHTML = corpoEmail;
+        }
+
+        function gerarTabelaHTML(dados, tipoAba) {
+            let cabecalhos, linhaValores;
+
+            if (tipoAba === "PNG MARÍTIMO") {
+                cabecalhos = ["N_PEDIDO", "REF_NH", "AREA", "NUMERO_DI", "FORNECEDOR", "FATURA", "CNTR", "BL", "VOLUMES", "PB", "M3", "CIF"];
+                linhaValores = [
+                    dados.po || `F25P${dados.faturaNumero?.slice(-6) || ""}`,
+                    dados.referenciaGnh || "",
+                    "MPRQB19",
+                    dados.numeroDI?.replace(/[-\/]/g, "") || "",
+                    dados.exportador || "",
+                    dados.faturaNumero || "",
+                    dados.container || "",
+                    dados.conhecimentoMaster || "",
+                    dados.volumes || "",
+                    dados.pesoLiquido || "",
+                    "",
+                    dados.cif || ""
+                ];
+            } else {
+                cabecalhos = ["N_PEDIDO", "REF_NH", "NUMERO_DI", "FORNECEDOR", "FATURA", "MASTER", "HOUSE", "VOLUMES", "PB", "M3", "CIF"];
+                linhaValores = [
+                    dados.po || `F25P${dados.faturaNumero?.slice(-6) || ""}`,
+                    dados.referenciaGnh || "",
+                    dados.numeroDI?.replace(/[-\/]/g, "") || "",
+                    dados.exportador || "",
+                    dados.faturaNumero || "",
+                    dados.conhecimentoMaster || "",
+                    dados.conhecimentoHouse || "",
+                    dados.volumes || "",
+                    dados.pesoLiquido || "",
+                    "",
+                    dados.cif || ""
+                ];
+            }
+
+            return `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${cabecalhos.map(h => `<th>${h}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            ${linhaValores.map(v => `<td>${v}</td>`).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function enviarEmail() {
+            if (!processoAtual) {
+                showNotification('Busque um processo primeiro!', 'error');
+                return;
+            }
+
+            if (destinatarios.para.length === 0) {
+                showNotification('Adicione pelo menos um destinatário principal!', 'error');
+                return;
+            }
+
+            const tipoAba = document.getElementById('tipo-aba').value;
+
+            try {
+                showNotification('Criando rascunho de email...', 'warning');
+                
+                const resultado = await chamarAPI('enviarEmail', {
+                    processo: processoAtual,
+                    destinatarios: destinatarios,
+                    tipoAba: tipoAba
+                });
+
+                if (resultado && resultado.success) {
+                    showNotification(resultado.message || 'Rascunho criado com sucesso!', 'success');
+                    
+                    // Limpar formulário
+                    document.getElementById('referencia').value = '';
+                    document.getElementById('tipo-aba').value = '';
+                    destinatarios = { para: [], cc: [], cco: [] };
+                    atualizarTagsDestinatarios();
+                    document.getElementById('results').style.display = 'none';
+                    processoAtual = null;
+                } else {
+                    showNotification(resultado?.error || 'Erro ao criar rascunho!', 'error');
+                }
+                
+            } catch (error) {
+                showNotification('Erro ao enviar email!', 'error');
+                console.error('Erro:', error);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // 🆕 FUNÇÃO PARA MOSTRAR/OCULTAR CONFIGURAÇÃO
+        function toggleConfig() {
+            const config = document.getElementById('config-section');
+            config.style.display = config.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 🆕 ADICIONAR BOTÃO PARA RECONFIGURAR API
+        document.addEventListener('DOMContentLoaded', function() {
+            if (API_URL) {
+                const header = document.querySelector('.header .subtitle');
+                header.innerHTML += ` <button onclick="toggleConfig()" style="margin-left: 10px; padding: 4px 8px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem;">⚙️ Config API</button>`;
+            }
+        });
+    </script>
+</body>
+</html>
+                    <div class="info-label">Referência Cliente</div>
+                    <div class="info-value">${dados.referenciaCliente || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Referência GNH</div>
+                    <div class="info-value">${dados.referenciaGnh || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Número DI</div>
+                    <div class="info-value">${dados.numeroDI || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Exportador</div>
+                    <div class="info-value">${dados.exportador || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Fatura</div>
+                    <div class="info-value">${dados.faturaNumero || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Master</div>
+                    <div class="info-value">${dados.conhecimentoMaster || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">House</div>
+                    <div class="info-value">${dados.conhecimentoHouse || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Canal DI</div>
+                    <div class="info-value">${dados.diCanal || 'N/A'}</div>
+                </div>
+                <div class="info-item">
